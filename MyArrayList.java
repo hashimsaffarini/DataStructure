@@ -12,7 +12,7 @@ public class MyArrayList<T> {
 
     public void add(T val) {
         if (size == arr.length) {
-            reSize();
+            resize(arr.length * 2);
         }
         arr[size++] = val;
     }
@@ -20,7 +20,7 @@ public class MyArrayList<T> {
     public void add(int index, T val) {
         if (index >= 0 && index <= size) {
             if (size == arr.length) {
-                reSize();
+                resize(arr.length * 2);
             }
             shiftRight(index);
             arr[index] = val;
@@ -29,18 +29,21 @@ public class MyArrayList<T> {
         }
     }
 
-    public void shiftRight(int index) {
+    private void shiftRight(int index) {
         for (int i = size; i > index; i--) {
             arr[i] = arr[i - 1];
         }
         size++;
     }
 
-    public void shiftLeft(int index) {
+    private void shiftLeft(int index) {
         for (int i = index; i < size - 1; i++) {
             arr[i] = arr[i + 1];
         }
-        size--;
+        arr[--size] = null;
+        if (size > 0 && size == arr.length / 4) {
+            resize(arr.length / 2);
+        }
     }
 
     public T set(int index, T val) {
@@ -97,9 +100,11 @@ public class MyArrayList<T> {
         return size == 0;
     }
 
-    public void reSize() {
-        T[] newArray = (T[]) new Object[arr.length * 2];
-        System.arraycopy(arr, 0, newArray, 0, size);
+    private void resize(int newCapacity) {
+        T[] newArray = (T[]) new Object[newCapacity];
+        for (int i = 0; i < size; i++) {
+            newArray[i] = arr[i];
+        }
         arr = newArray;
     }
 
@@ -123,8 +128,8 @@ public class MyArrayList<T> {
     }
 
     public void addAll(MyArrayList<T> other) {
-        if (other.size + this.size > arr.length) {
-            reSize();
+        while (other.size + this.size > arr.length) {
+            resize(arr.length * 2);
         }
         for (int i = 0; i < other.size; i++) {
             this.add(other.get(i));
